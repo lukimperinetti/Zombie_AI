@@ -26,8 +26,8 @@ end
 
 function love.load()
     -- Initialize game resources and variables here
-    local screeWidth = love.graphics.getWidth()
-    local screeHeight = love.graphics.getHeight()
+    local screeWidth = love.graphics.getWidth() / 2
+    local screeHeight = love.graphics.getHeight() / 2
 
     human = CreateSprite(lstSprites, 'human', 'player_', 4) -- became pList, pType, pImageFile, pFrame
     human.x = screeWidth / 2
@@ -36,13 +36,38 @@ end
 
 function love.update(dt)
     -- Update game logic here
+
+    for i, sprite in ipairs(lstSprites) do
+        sprite.currentFrame = sprite.currentFrame + 0.1
+        if sprite.currentFrame > #sprite.images + 1 then
+            sprite.currentFrame = 1
+        end
+    end
+
+    if love.keyboard.isDown("q") then -- go left
+        human.x = human.x - 1
+    end
+    if love.keyboard.isDown("z") then -- go up
+        human.y = human.y - 1
+    end
+    if love.keyboard.isDown("d") then -- go right
+        human.x = human.x + 1
+    end
+    if love.keyboard.isDown("s") then -- go down
+        human.y = human.y + 1
+    end
 end
 
 function love.draw()
+    love.graphics.push()
+    love.graphics.scale(2, 2)
+
     for i, sprite in ipairs(lstSprites) do
-        local frame = sprite.images[sprite.currentFrame]
+        local frame = sprite.images[math.floor(sprite.currentFrame)]
         love.graphics.draw(frame, sprite.x - sprite.width / 2, sprite.y - sprite.height / 2)
     end
+
+    love.graphics.pop()
 end
 
 function love.keypressed(key)
