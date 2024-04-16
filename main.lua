@@ -2,6 +2,10 @@
 local lstSprites = {}
 local human = {}
 
+function CreateZombies(pList, pType, pImageFile, pFrame) -- pList: find in lstSprites, pType: wich type? Zombie, human..., pImageFile: name of the file, pFrame: number of frames (player move etc..), pNumber: number of zombies
+
+end
+
 -- Sprite generation for Zombie & Human
 function CreateSprite(pList, pType, pImageFile, pFrame) -- pList: find in lstSprites, pType: wich type? Zombie, human..., pImageFile: name of the file, pFrame: number of frames (player move etc..)
     local mySprite = {}
@@ -31,7 +35,14 @@ function love.load()
 
     human = CreateSprite(lstSprites, 'human', 'player_', 4) -- became pList, pType, pImageFile, pFrame
     human.x = screeWidth / 2
-    human.y = screeHeight / 2
+    human.y = (screeHeight / 2) + (screeHeight / 4)
+
+    local nZombies
+    for nZombies = 1, 10 do
+        local zombie = CreateSprite(lstSprites, 'zombie', 'monster_', 2) -- became pList, pType, pImageFile, pFrame, pNumber
+        zombie.x = math.random(10, screeWidth - 10)
+        zombie.y = math.random(10, (screeHeight / 2) - 10)
+    end
 end
 
 function love.update(dt)
