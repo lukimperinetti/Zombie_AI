@@ -1,9 +1,23 @@
+-- Renvoie l'angle entre deux vecteurs supposant la même origine.
+function math.angle(x1, y1, x2, y2) return math.atan(y2 - y1, x2 - x1) end
+
+-- Retourne la distance entre deux points
+function math.dist(x1, y1, x2, y2) return ((x2 - x1) ^ 2 + (y2 - y1) ^ 2) ^ 0.5 end
+
 -- Initialize player & entities
 local lstSprites = {}
 local human = {}
 
-function CreateZombies(pList, pType, pImageFile, pFrame) -- pList: find in lstSprites, pType: wich type? Zombie, human..., pImageFile: name of the file, pFrame: number of frames (player move etc..), pNumber: number of zombies
+function CreateZombies(pList, pType, pImageFile, pFrame)             -- pList: find in lstSprites, pType: wich type? Zombie, human..., pImageFile: name of the file, pFrame: number of frames (player move etc..), pNumber: number of zombies
+    local zombie = CreateSprite(lstSprites, 'zombie', 'monster_', 2) -- became pList, pType, pImageFile, pFrame, pNumber
+    zombie.x = math.random(10, screeWidth - 10)
+    zombie.y = math.random(10, (screeHeight / 2) - 10)
 
+    zombie.speed = math.random(5, 50) / 100
+
+    local angle = math.angle(zombie.x, zombie.y, human.x, human.y)
+    zombie.vx = zombie.speed * 60 * math.cos(angle)
+    zombie.vy = zombie.speed * 60 * math.cos(angle)
 end
 
 -- Sprite generation for Zombie & Human
@@ -19,10 +33,12 @@ function CreateSprite(pList, pType, pImageFile, pFrame) -- pList: find in lstSpr
         mySprite.images[i] = love.graphics.newImage(fileName)
     end
 
-    mySprite.x = 0
-    mySprite.y = 0
     mySprite.width = mySprite.images[1]:getWidth()
     mySprite.height = mySprite.images[1]:getHeight()
+    mySprite.x = 0
+    mySprite.y = 0
+    mySprite.vx = 0
+    mySprite.vy = 0
 
     table.insert(pList, mySprite)
     return mySprite
@@ -30,18 +46,16 @@ end
 
 function love.load()
     -- Initialize game resources and variables here
-    local screeWidth = love.graphics.getWidth() / 2
-    local screeHeight = love.graphics.getHeight() / 2
+    screeWidth = love.graphics.getWidth() / 2
+    screeHeight = love.graphics.getHeight() / 2
 
     human = CreateSprite(lstSprites, 'human', 'player_', 4) -- became pList, pType, pImageFile, pFrame
     human.x = screeWidth / 2
     human.y = (screeHeight / 2) + (screeHeight / 4)
 
     local nZombies
-    for nZombies = 1, 10 do
-        local zombie = CreateSprite(lstSprites, 'zombie', 'monster_', 2) -- became pList, pType, pImageFile, pFrame, pNumber
-        zombie.x = math.random(10, screeWidth - 10)
-        zombie.y = math.random(10, (screeHeight / 2) - 10)
+    for nZombies = 1, 15 do
+        CreateZombies(lstSprites, 'zombie', 'monster_', 2) -- became pList, pType, pImageFile, pFrame (10 zombies)
     end
 end
 
@@ -53,6 +67,9 @@ function love.update(dt)
         if sprite.currentFrame > #sprite.images + 1 then
             sprite.currentFrame = 1
         end
+        -- velocity
+        sprite.x = sprite.x + sprite.vx
+        sprite.y = sprite.y + sprite.vy
     end
 
     if love.keyboard.isDown("q") then -- go left
